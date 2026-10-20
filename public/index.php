@@ -4,15 +4,18 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/src/bootstrap.php';
 
 $errorMessage = null;
+$errorArabicMessage = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf()) {
         $errorMessage = 'Your session expired. Please refresh the page and try again.';
+        $errorArabicMessage = 'انتهت الجلسة. يرجى تحديث الصفحة ثم المحاولة مرة أخرى.';
     } else {
         $fullName = clean_field($_POST['full_name'] ?? null, 160);
         $professionalTitle = clean_field($_POST['professional_title'] ?? null, 120);
 
         if ($fullName === null || $professionalTitle === null) {
             $errorMessage = 'Please enter a valid full name and professional title.';
+            $errorArabicMessage = 'يرجى إدخال الاسم الكامل والمسمى الوظيفي بشكل صحيح.';
         } else {
             $normalizedName = mb_strtolower($fullName, 'UTF-8');
             $normalizedTitle = mb_strtolower($professionalTitle, 'UTF-8');
@@ -28,14 +31,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':professional_title' => $professionalTitle,
                     ':duplicate_key' => $duplicateKey,
                 ]);
+
+                $notificationEmail = $config['notification_email'] ?? 'contact@whs-egy.com';
+                $mailFrom = $config['mail_from'] ?? 'noreply@whs-egy.com';
+                $mailSubject = 'New WHS Egypt 2026 VIP attendance confirmation';
+                $mailBody = "A new VIP attendance confirmation was saved.\n\n"
+                    . "Full Name: {$fullName}\n"
+                    . "Professional Title / Position: {$professionalTitle}\n";
+                $mailHeaders = [
+                    'From: WHS Invitation <' . $mailFrom . '>',
+                    'MIME-Version: 1.0',
+                    'Content-Type: text/plain; charset=UTF-8',
+                ];
+
+                if (filter_var($notificationEmail, FILTER_VALIDATE_EMAIL) === false
+                    || filter_var($mailFrom, FILTER_VALIDATE_EMAIL) === false
+                    || !@mail($notificationEmail, $mailSubject, $mailBody, implode("\r\n", $mailHeaders))) {
+                    error_log('WHS invitation email notification could not be handed off to the configured mail transport.');
+                }
+
                 $_SESSION['confirmed'] = true;
                 redirect('/');
             } catch (PDOException $error) {
                 if ($error->getCode() === '23000') {
                     $errorMessage = 'A confirmation with these details has already been received.';
+                    $errorArabicMessage = 'تم استلام تأكيد بهذه البيانات من قبل.';
                 } else {
                     error_log('WHS invitation submission failed: ' . $error->getMessage());
                     $errorMessage = 'We could not save your confirmation. Please try again shortly.';
+                    $errorArabicMessage = 'تعذر حفظ التأكيد. يرجى المحاولة مرة أخرى بعد قليل.';
                 }
             }
         }
@@ -51,23 +75,23 @@ unset($_SESSION['confirmed']);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f7f1e8">
+    <meta name="description" content="VIP invitation and attendance confirmation for the Women's Health Summit 2026 in Cairo.">
     <title>VIP Invitation | Women's Health Summit 2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@500;600;700&family=Tajawal:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="/assets/invitation.css">
 </head>
 <body>
     <main class="invitation-shell">
         <header class="masthead" aria-label="Women's Health Summit">
-            <span class="masthead-mark" aria-hidden="true">W</span>
+            <img class="masthead-logo" src="/assets/whs-logo-transparent.png" alt="WHS Egypt 2026 logo" width="52" height="52" fetchpriority="high">
             <span>Women's Health Summit <b>2026</b></span>
         </header>
 
         <section class="invitation-layout" aria-labelledby="event-title">
             <figure class="poster-wrap">
                 <img class="poster" src="/assets/invitation.jpeg" alt="VIP invitation to the Women's Health Summit, 5–6 December 2026, at Cairo Marriott Hotel in Zamalek" width="904" height="1280">
-                <figcaption>AN INVITATION TO JOIN US</figcaption>
             </figure>
 
             <div class="details-panel">
@@ -99,22 +123,39 @@ unset($_SESSION['confirmed']);
                     </div>
                 <?php else: ?>
                     <?php if ($errorMessage !== null): ?>
-                        <div class="notice error" role="alert"><?= escape($errorMessage) ?></div>
+                        <div class="notice error" role="alert">
+                            <span><?= escape($errorMessage) ?></span>
+                            <span lang="ar" dir="rtl"><?= escape($errorArabicMessage ?? '') ?></span>
+                        </div>
                     <?php endif; ?>
-                    <form method="post" action="/" class="confirmation-form">
+                    <form method="post" action="/" class="confirmation-form" data-confirmation-form>
                         <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
-                        <label for="full-name">Full name <span>*</span></label>
-                        <input id="full-name" name="full_name" type="text" maxlength="160" autocomplete="name" required>
+                        <div class="form-field">
+                            <label for="full-name">
+                                <span>Full name <b aria-hidden="true">*</b></span>
+                                <span lang="ar" dir="rtl">الاسم الكامل <b aria-hidden="true">*</b></span>
+                            </label>
+                            <input id="full-name" name="full_name" type="text" maxlength="160" autocomplete="name" placeholder="Enter your full name" dir="auto" required>
+                        </div>
 
-                        <label for="professional-title">Professional title / position <span>*</span></label>
-                        <input id="professional-title" name="professional_title" type="text" maxlength="120" autocomplete="organization-title" required>
+                        <div class="form-field">
+                            <label for="professional-title">
+                                <span>Professional title / position <b aria-hidden="true">*</b></span>
+                                <span lang="ar" dir="rtl">المسمى الوظيفي <b aria-hidden="true">*</b></span>
+                            </label>
+                            <input id="professional-title" name="professional_title" type="text" maxlength="120" autocomplete="organization-title" placeholder="Enter your professional title or position" dir="auto" required>
+                        </div>
 
-                        <button type="submit">CONFIRM ATTENDANCE <span aria-hidden="true">|</span> <b lang="ar" dir="rtl">تأكيد الحضور</b></button>
+                        <button class="submit-button" type="submit">
+                            <span class="submit-spinner" aria-hidden="true"></span>
+                            <span data-submit-label>CONFIRM ATTENDANCE</span>
+                            <span aria-hidden="true">|</span>
+                            <b lang="ar" dir="rtl" data-submit-label-ar>تأكيد الحضور</b>
+                        </button>
+                        <span class="visually-hidden" data-submit-status aria-live="polite"></span>
                     </form>
                 <?php endif; ?>
 
-                <p class="closing-note">We look forward to welcoming you in Cairo.</p>
-                <p class="closing-arabic" lang="ar" dir="rtl">نتطلع إلى استقبالكم في القاهرة</p>
             </div>
         </section>
 
@@ -123,5 +164,6 @@ unset($_SESSION['confirmed']);
             <span>CAIRO · 5—6 DECEMBER</span>
         </footer>
     </main>
+    <script src="/assets/invitation.js" defer></script>
 </body>
 </html>

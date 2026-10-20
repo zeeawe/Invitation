@@ -72,7 +72,7 @@ $attendees = $adminAuthenticated
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Attendee Administration | WHS 2026</title>
-    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="/assets/invitation.css">
 </head>
 <body class="admin-page">
     <main class="admin-shell">

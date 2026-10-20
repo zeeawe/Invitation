@@ -7,6 +7,7 @@ Standalone invitation and attendance confirmation site. It does not integrate wi
 - PHP 8.1 or later with `PDO_SQLite` and `mbstring` enabled.
 - An HTTPS-enabled subdomain whose document root can be set to this project's `public/` directory.
 - PHP write permission for this project's `var/` directory (the app creates it with private permissions if it does not exist).
+- A configured outbound PHP mail transport and an authorized sender address for RSVP notifications to `contact@whs-egy.com`.
 - Outbound access to Google Fonts for the selected typefaces. The page remains usable with local fallback fonts if fonts are unavailable.
 
 The hosting provider, DNS, subdomain document root, SSL certificate, and available PHP extensions are not represented in this repository and have not been verified. Confirm these requirements with the host before deployment. If the host does not support PDO SQLite, this build is not compatible without an explicitly scoped database adaptation; do not point the public document root at the project root.
@@ -22,9 +23,10 @@ The hosting provider, DNS, subdomain document root, SSL certificate, and availab
 	```
 
 	Replace `REPLACE_WITH_A_PASSWORD_HASH` in `config.php` with the generated hash. Do not use the example string as a real password. Keep `config.php` private and do not commit it.
-4. Ensure the PHP process can write to the project's `var/` directory. The SQLite database is created automatically on the first request and is outside the public document root.
-5. Upload the project while preserving the directory structure and supplied invitation artwork. Set the runtime PHP version to 8.1 or later and verify that `pdo_sqlite` and `mbstring` are enabled.
-6. Visit the subdomain over HTTPS, submit a test confirmation, then visit `/admin.php` and sign in with the password used to create the hash. Use **EXPORT CSV** to download an Excel-compatible attendee file. Remove any test record directly from the private database before launch.
+4. Set `mail_from` in `config.php` to a sender address authorized by the hosting provider. Configure its PHP mail transport (or the hosting account's outbound mail service); the app sends a notification to `notification_email` after each successfully saved RSVP. A successful on-page confirmation means the RSVP was saved; actual email delivery depends on the host's mail transport and sender-domain configuration.
+5. Ensure the PHP process can write to the project's `var/` directory. The SQLite database is created automatically on the first request and is outside the public document root.
+6. Upload the project while preserving the directory structure and supplied invitation artwork. Set the runtime PHP version to 8.1 or later and verify that `pdo_sqlite` and `mbstring` are enabled.
+7. Visit the subdomain over HTTPS, submit a test confirmation, then visit `/admin.php` and sign in with the password used to create the hash. Use **EXPORT CSV** to download an Excel-compatible attendee file. Remove any test record directly from the private database before launch.
 
 The administrator password hash is the only required secret. Attendee records and SQLite files are never served from the configured public document root. Back up the private database securely and restrict access to deployment files.
 
