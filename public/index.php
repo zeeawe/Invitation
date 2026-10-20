@@ -1,0 +1,127 @@
+<?php
+declare(strict_types=1);
+
+require dirname(__DIR__) . '/src/bootstrap.php';
+
+$errorMessage = null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf()) {
+        $errorMessage = 'Your session expired. Please refresh the page and try again.';
+    } else {
+        $fullName = clean_field($_POST['full_name'] ?? null, 160);
+        $professionalTitle = clean_field($_POST['professional_title'] ?? null, 120);
+
+        if ($fullName === null || $professionalTitle === null) {
+            $errorMessage = 'Please enter a valid full name and professional title.';
+        } else {
+            $normalizedName = mb_strtolower($fullName, 'UTF-8');
+            $normalizedTitle = mb_strtolower($professionalTitle, 'UTF-8');
+            $duplicateKey = hash('sha256', $normalizedName . "\0" . $normalizedTitle);
+
+            try {
+                $statement = $database->prepare(
+                    'INSERT INTO attendees (full_name, professional_title, duplicate_key)
+                     VALUES (:full_name, :professional_title, :duplicate_key)'
+                );
+                $statement->execute([
+                    ':full_name' => $fullName,
+                    ':professional_title' => $professionalTitle,
+                    ':duplicate_key' => $duplicateKey,
+                ]);
+                $_SESSION['confirmed'] = true;
+                redirect('/');
+            } catch (PDOException $error) {
+                if ($error->getCode() === '23000') {
+                    $errorMessage = 'A confirmation with these details has already been received.';
+                } else {
+                    error_log('WHS invitation submission failed: ' . $error->getMessage());
+                    $errorMessage = 'We could not save your confirmation. Please try again shortly.';
+                }
+            }
+        }
+    }
+}
+
+$confirmed = !empty($_SESSION['confirmed']);
+unset($_SESSION['confirmed']);
+?>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f1e8">
+    <title>VIP Invitation | Women's Health Summit 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@500;600;700&family=Tajawal:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+    <main class="invitation-shell">
+        <header class="masthead" aria-label="Women's Health Summit">
+            <span class="masthead-mark" aria-hidden="true">W</span>
+            <span>Women's Health Summit <b>2026</b></span>
+        </header>
+
+        <section class="invitation-layout" aria-labelledby="event-title">
+            <figure class="poster-wrap">
+                <img class="poster" src="/assets/invitation.jpeg" alt="VIP invitation to the Women's Health Summit, 5–6 December 2026, at Cairo Marriott Hotel in Zamalek" width="904" height="1280">
+                <figcaption>AN INVITATION TO JOIN US</figcaption>
+            </figure>
+
+            <div class="details-panel">
+                <div class="eyebrow"><span></span> BY SPECIAL INVITATION <span></span></div>
+                <p class="arabic-kicker" lang="ar" dir="rtl">دعوة خاصة</p>
+                <h1 id="event-title">Women's Health<br>Summit <span>2026</span></h1>
+                <p class="intro">We are honored to invite you to an exceptional gathering dedicated to advancing women's health.</p>
+
+                <div class="event-details" aria-label="Event details">
+                    <div class="detail-row">
+                        <span class="detail-label">DATE</span>
+                        <span>5–6 December 2026</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">VENUE</span>
+                        <span>Cairo Marriott Hotel<br><span class="muted">Zamalek, Cairo</span></span>
+                    </div>
+                </div>
+
+                <div class="form-heading">
+                    <h2>Confirm your attendance</h2>
+                    <p lang="ar" dir="rtl">يرجى تأكيد الحضور</p>
+                </div>
+
+                <?php if ($confirmed): ?>
+                    <div class="notice success" role="status">
+                        <strong>Thank you. Your attendance is confirmed.</strong>
+                        <span lang="ar" dir="rtl">شكرًا لكم، تم تأكيد حضوركم.</span>
+                    </div>
+                <?php else: ?>
+                    <?php if ($errorMessage !== null): ?>
+                        <div class="notice error" role="alert"><?= escape($errorMessage) ?></div>
+                    <?php endif; ?>
+                    <form method="post" action="/" class="confirmation-form">
+                        <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
+                        <label for="full-name">Full name <span>*</span></label>
+                        <input id="full-name" name="full_name" type="text" maxlength="160" autocomplete="name" required>
+
+                        <label for="professional-title">Professional title / position <span>*</span></label>
+                        <input id="professional-title" name="professional_title" type="text" maxlength="120" autocomplete="organization-title" required>
+
+                        <button type="submit">CONFIRM ATTENDANCE <span aria-hidden="true">|</span> <b lang="ar" dir="rtl">تأكيد الحضور</b></button>
+                    </form>
+                <?php endif; ?>
+
+                <p class="closing-note">We look forward to welcoming you in Cairo.</p>
+                <p class="closing-arabic" lang="ar" dir="rtl">نتطلع إلى استقبالكم في القاهرة</p>
+            </div>
+        </section>
+
+        <footer class="page-footer">
+            <span>WOMEN'S HEALTH SUMMIT 2026</span>
+            <span>CAIRO · 5—6 DECEMBER</span>
+        </footer>
+    </main>
+</body>
+</html>
