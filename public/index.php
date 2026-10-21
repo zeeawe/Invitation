@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':notes' => $notes,
                     ':duplicate_key' => $duplicateKey,
                 ]);
+                $attendeeId = (int) $database->lastInsertId();
 
                 $notificationEmail = $config['notification_email'] ?? 'contact@whs-egy.com';
                 $mailFrom = $config['mail_from'] ?? 'noreply@whs-egy.com';
@@ -73,7 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $_SESSION['confirmed'] = true;
-                redirect('/');
+                $_SESSION['confirmed_attendee_id'] = $attendeeId;
+                redirect('/personalized-invitation.php');
             } catch (PDOException $error) {
                 if ($error->getCode() === '23000') {
                     $errorMessage = 'A confirmation with these details has already been received.';
