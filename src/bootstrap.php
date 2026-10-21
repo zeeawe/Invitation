@@ -47,6 +47,10 @@ try {
             confirmed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )'
     );
+    $attendeeColumns = array_column($database->query('PRAGMA table_info(attendees)')->fetchAll(), 'name');
+    if (!in_array('notes', $attendeeColumns, true)) {
+        $database->exec("ALTER TABLE attendees ADD COLUMN notes TEXT NOT NULL DEFAULT ''");
+    }
     @chmod($config['database_path'], 0600);
 } catch (Throwable $error) {
     error_log('WHS invitation database initialization failed: ' . $error->getMessage());

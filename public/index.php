@@ -12,8 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $fullName = clean_field($_POST['full_name'] ?? null, 160);
         $professionalTitle = clean_field($_POST['professional_title'] ?? null, 120);
+        $notesInput = $_POST['notes'] ?? '';
+        $notes = is_string($notesInput)
+            ? (trim($notesInput) === '' ? '' : clean_field($notesInput, 500))
+            : null;
 
-        if ($fullName === null || $professionalTitle === null) {
+        if ($fullName === null || $professionalTitle === null || $notes === null) {
             $errorMessage = 'Please enter a valid full name and professional title.';
             $errorArabicMessage = 'يرجى إدخال الاسم الكامل والمسمى الوظيفي بشكل صحيح.';
         } else {
@@ -23,12 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             try {
                 $statement = $database->prepare(
-                    'INSERT INTO attendees (full_name, professional_title, duplicate_key)
-                     VALUES (:full_name, :professional_title, :duplicate_key)'
+                    'INSERT INTO attendees (full_name, professional_title, notes, duplicate_key)
+                     VALUES (:full_name, :professional_title, :notes, :duplicate_key)'
                 );
                 $statement->execute([
                     ':full_name' => $fullName,
                     ':professional_title' => $professionalTitle,
+                    ':notes' => $notes,
                     ':duplicate_key' => $duplicateKey,
                 ]);
 
@@ -37,7 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mailSubject = 'New WHS Egypt 2026 VIP attendance confirmation';
                 $mailBody = "A new VIP attendance confirmation was saved.\n\n"
                     . "Full Name: {$fullName}\n"
-                    . "Professional Title / Position: {$professionalTitle}\n";
+                    . "Professional Title / Position: {$professionalTitle}\n"
+                    . ($notes !== '' ? "Additional Notes: {$notes}\n" : '');
                 $mailHeaders = [
                     'From: WHS Invitation <' . $mailFrom . '>',
                     'MIME-Version: 1.0',
@@ -85,8 +91,13 @@ unset($_SESSION['confirmed']);
 <body>
     <main class="invitation-shell">
         <header class="masthead" aria-label="Women's Health Summit">
-            <img class="masthead-logo" src="/assets/whs-logo-transparent.png" alt="WHS Egypt 2026 logo" width="52" height="52" fetchpriority="high">
-            <span>Women's Health Summit <b>2026</b></span>
+            <div class="masthead-brand">
+                <img class="masthead-logo" src="/assets/whs-logo-transparent.png" alt="WHS Egypt 2026 logo" width="52" height="52" fetchpriority="high">
+                <div class="masthead-copy">
+                    <span>Women's Health Summit <b>2026</b></span>
+                    <span class="edition-label">The 3rd Edition | <span lang="ar" dir="rtl">النسخة الثالثة</span></span>
+                </div>
+            </div>
         </header>
 
         <section class="invitation-layout" aria-labelledby="event-title">
@@ -97,7 +108,7 @@ unset($_SESSION['confirmed']);
             <div class="details-panel">
                 <div class="eyebrow"><span></span> BY SPECIAL INVITATION <span></span></div>
                 <p class="arabic-kicker" lang="ar" dir="rtl">دعوة خاصة</p>
-                <h1 id="event-title">Women's Health<br>Summit <span>2026</span></h1>
+                <h1 id="event-title">Women's Health<br>Summit <span>2026</span><span class="title-shine" aria-hidden="true">Women's Health<br>Summit 2026</span></h1>
                 <p class="intro">We are honored to invite you to an exceptional gathering dedicated to advancing women's health.</p>
 
                 <div class="event-details" aria-label="Event details">
@@ -146,6 +157,14 @@ unset($_SESSION['confirmed']);
                             <input id="professional-title" name="professional_title" type="text" maxlength="120" autocomplete="organization-title" placeholder="Enter your professional title or position" dir="auto" required>
                         </div>
 
+                        <div class="form-field">
+                            <label for="attendee-notes">
+                                <span>Additional notes <b>(optional)</b></span>
+                                <span lang="ar" dir="rtl">ملاحظات إضافية (اختياري)</span>
+                            </label>
+                            <textarea id="attendee-notes" name="notes" maxlength="500" rows="3" placeholder="Anything else you would like us to know?" dir="auto"></textarea>
+                        </div>
+
                         <button class="submit-button" type="submit">
                             <span class="submit-spinner" aria-hidden="true"></span>
                             <span data-submit-label>CONFIRM ATTENDANCE</span>
@@ -159,10 +178,19 @@ unset($_SESSION['confirmed']);
             </div>
         </section>
 
+        <section class="summit-brochure-section" aria-label="About the Women's Health Summit">
+            <figure class="summit-brochure">
+                <img src="/assets/whs-summit-brochure.jpeg" alt="Women's Health Summit brochure featuring summit information, objectives, and scientific tracks" width="1280" height="906" loading="lazy">
+            </figure>
+        </section>
+
         <footer class="page-footer">
             <span>WOMEN'S HEALTH SUMMIT 2026</span>
             <span>CAIRO · 5—6 DECEMBER</span>
         </footer>
+        <div class="page-edition-footer">
+            <span class="edition-label">The 3rd Edition | <span lang="ar" dir="rtl">النسخة الثالثة</span></span>
+        </div>
     </main>
     <script src="/assets/invitation.js" defer></script>
 </body>

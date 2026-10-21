@@ -38,16 +38,16 @@ if (($_GET['export'] ?? '') === 'csv') {
     }
 
     $attendees = $database->query(
-        'SELECT full_name, professional_title, confirmed_at FROM attendees ORDER BY confirmed_at, id'
+        'SELECT full_name, professional_title, notes, confirmed_at FROM attendees ORDER BY confirmed_at, id'
     )->fetchAll();
 
     header('Content-Type: text/csv; charset=UTF-8');
     header('Content-Disposition: attachment; filename="whs-2026-attendees.csv"');
     $output = fopen('php://output', 'wb');
     fwrite($output, "\xEF\xBB\xBF");
-    fputcsv($output, ['Full Name', 'Professional Title / Position', 'Confirmed At']);
+    fputcsv($output, ['Full Name', 'Professional Title / Position', 'Additional Notes', 'Confirmed At']);
     foreach ($attendees as $attendee) {
-        $values = [$attendee['full_name'], $attendee['professional_title'], $attendee['confirmed_at']];
+        $values = [$attendee['full_name'], $attendee['professional_title'], $attendee['notes'], $attendee['confirmed_at']];
         foreach ($values as &$value) {
             if (preg_match('/^[\s]*[=+\-@]/u', $value)) {
                 $value = "'" . $value;
@@ -63,7 +63,7 @@ if (($_GET['export'] ?? '') === 'csv') {
 $adminAuthenticated = !empty($_SESSION['admin_authenticated']);
 $errorMessage = flash('admin_error');
 $attendees = $adminAuthenticated
-    ? $database->query('SELECT full_name, professional_title, confirmed_at FROM attendees ORDER BY confirmed_at DESC, id DESC')->fetchAll()
+    ? $database->query('SELECT full_name, professional_title, notes, confirmed_at FROM attendees ORDER BY confirmed_at DESC, id DESC')->fetchAll()
     : [];
 ?>
 <!doctype html>
@@ -116,18 +116,19 @@ $attendees = $adminAuthenticated
                 <div class="table-wrap">
                     <table>
                         <thead>
-                            <tr><th>Full name</th><th>Professional title / position</th><th>Confirmed</th></tr>
+                            <tr><th>Full name</th><th>Professional title / position</th><th>Additional notes</th><th>Confirmed</th></tr>
                         </thead>
                         <tbody>
                             <?php foreach ($attendees as $attendee): ?>
                                 <tr>
                                     <td><?= escape($attendee['full_name']) ?></td>
                                     <td><?= escape($attendee['professional_title']) ?></td>
+                                    <td><?= escape($attendee['notes']) ?></td>
                                     <td><?= escape($attendee['confirmed_at']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <?php if ($attendees === []): ?>
-                                <tr><td colspan="3" class="empty-state">No confirmations have been received yet.</td></tr>
+                                <tr><td colspan="4" class="empty-state">No confirmations have been received yet.</td></tr>
                             <?php endif; ?>
                         </tbody>
                     </table>

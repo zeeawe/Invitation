@@ -1,6 +1,6 @@
 # Women's Health Summit 2026 VIP Invitation
 
-Standalone invitation and attendance confirmation site. It does not integrate with or modify the WHS website. The invitee form collects only a full name and professional title / position.
+Standalone invitation and attendance confirmation site. It does not integrate with or modify the WHS website. The invitee form collects a full name and professional title / position, with an optional note of up to 500 characters.
 
 ## Hosting Requirements
 
@@ -45,4 +45,4 @@ Open `http://127.0.0.1:8080`. The local PHP environment must have the same `PDO_
 - `/` — public invitation and attendance confirmation.
 - `/admin.php` — password-protected attendee review and CSV export.
 
-The app rejects invalid or oversized input, uses prepared statements and CSRF tokens, escapes displayed data, and enforces a unique normalized name/title pair to prevent accidental duplicate confirmations. Only the name and professional title are stored; the confirmation timestamp is recorded for administration.
+The app rejects invalid or oversized input, uses prepared statements and CSRF tokens, escapes displayed data, and enforces a unique normalized name/title pair to prevent accidental duplicate confirmations. Existing attendee databases are migrated additively to store optional notes without deleting prior records. Names, titles, optional notes, and the confirmation timestamp are available only in the authenticated admin view and CSV export.
