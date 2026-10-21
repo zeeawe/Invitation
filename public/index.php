@@ -205,13 +205,13 @@ unset($_SESSION['confirmed']);
                         </button>
                         <span class="visually-hidden" data-submit-status aria-live="polite"></span>
                     </form>
-                    <div class="poster-download-section">
-                        <a class="poster-download" href="/assets/invitation.jpeg" download="WHS-Egypt-2026-VIP-Invitation.jpeg">
-                            <span>DOWNLOAD INVITATION</span>
-                            <span lang="ar" dir="rtl">تحميل الدعوة</span>
-                        </a>
-                    </div>
                 <?php endif; ?>
+                <div class="poster-download-section">
+                    <a class="poster-download" href="/assets/invitation.jpeg" download="WHS-Egypt-2026-VIP-Invitation.jpeg">
+                        <span>DOWNLOAD INVITATION</span>
+                        <span lang="ar" dir="rtl">تحميل الدعوة</span>
+                    </a>
+                </div>
 
             </div>
         </section>
