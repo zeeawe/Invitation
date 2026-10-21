@@ -12,14 +12,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $fullName = clean_field($_POST['full_name'] ?? null, 160);
         $professionalTitle = clean_field($_POST['professional_title'] ?? null, 120);
+        $phoneNumber = clean_field($_POST['phone_number'] ?? null, 30);
+        $email = clean_field($_POST['email'] ?? null, 254);
         $notesInput = $_POST['notes'] ?? '';
         $notes = is_string($notesInput)
             ? (trim($notesInput) === '' ? '' : clean_field($notesInput, 500))
             : null;
 
-        if ($fullName === null || $professionalTitle === null || $notes === null) {
-            $errorMessage = 'Please enter a valid full name and professional title.';
-            $errorArabicMessage = 'يرجى إدخال الاسم الكامل والمسمى الوظيفي بشكل صحيح.';
+        $phoneDigits = $phoneNumber === null ? '' : preg_replace('/\D/', '', $phoneNumber);
+        if ($fullName === null
+            || $professionalTitle === null
+            || $phoneNumber === null
+            || !preg_match('/^\+?[0-9][0-9\s().-]*$/', $phoneNumber)
+            || !is_string($phoneDigits)
+            || strlen($phoneDigits) < 7
+            || strlen($phoneDigits) > 15
+            || $email === null
+            || filter_var($email, FILTER_VALIDATE_EMAIL) === false
+            || $notes === null) {
+            $errorMessage = 'Please enter a valid name, professional title, phone number, and email address.';
+            $errorArabicMessage = 'يرجى إدخال الاسم والمسمى الوظيفي ورقم الهاتف والبريد الإلكتروني بشكل صحيح.';
         } else {
             $normalizedName = mb_strtolower($fullName, 'UTF-8');
             $normalizedTitle = mb_strtolower($professionalTitle, 'UTF-8');
@@ -27,12 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             try {
                 $statement = $database->prepare(
-                    'INSERT INTO attendees (full_name, professional_title, notes, duplicate_key)
-                     VALUES (:full_name, :professional_title, :notes, :duplicate_key)'
+                    'INSERT INTO attendees (full_name, professional_title, phone_number, email, notes, duplicate_key)
+                     VALUES (:full_name, :professional_title, :phone_number, :email, :notes, :duplicate_key)'
                 );
                 $statement->execute([
                     ':full_name' => $fullName,
                     ':professional_title' => $professionalTitle,
+                    ':phone_number' => $phoneNumber,
+                    ':email' => $email,
                     ':notes' => $notes,
                     ':duplicate_key' => $duplicateKey,
                 ]);
@@ -43,6 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mailBody = "A new VIP attendance confirmation was saved.\n\n"
                     . "Full Name: {$fullName}\n"
                     . "Professional Title / Position: {$professionalTitle}\n"
+                    . "Phone Number: {$phoneNumber}\n"
+                    . "Email Address: {$email}\n"
                     . ($notes !== '' ? "Additional Notes: {$notes}\n" : '');
                 $mailHeaders = [
                     'From: WHS Invitation <' . $mailFrom . '>',
@@ -155,6 +171,22 @@ unset($_SESSION['confirmed']);
                                 <span lang="ar" dir="rtl">المسمى الوظيفي <b aria-hidden="true">*</b></span>
                             </label>
                             <input id="professional-title" name="professional_title" type="text" maxlength="120" autocomplete="organization-title" placeholder="Enter your professional title or position" dir="auto" required>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="phone-number">
+                                <span>Phone number <b aria-hidden="true">*</b></span>
+                                <span lang="ar" dir="rtl">رقم الهاتف <b aria-hidden="true">*</b></span>
+                            </label>
+                            <input id="phone-number" name="phone_number" type="tel" maxlength="30" autocomplete="tel" inputmode="tel" placeholder="Enter your phone number" dir="ltr" required>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="email-address">
+                                <span>Email address <b aria-hidden="true">*</b></span>
+                                <span lang="ar" dir="rtl">البريد الإلكتروني <b aria-hidden="true">*</b></span>
+                            </label>
+                            <input id="email-address" name="email" type="email" maxlength="254" autocomplete="email" placeholder="Enter your email address" dir="ltr" required>
                         </div>
 
                         <div class="form-field">

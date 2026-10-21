@@ -43,6 +43,8 @@ try {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             full_name TEXT NOT NULL,
             professional_title TEXT NOT NULL,
+            phone_number TEXT NOT NULL,
+            email TEXT NOT NULL,
             duplicate_key TEXT NOT NULL UNIQUE,
             confirmed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )'
@@ -50,6 +52,12 @@ try {
     $attendeeColumns = array_column($database->query('PRAGMA table_info(attendees)')->fetchAll(), 'name');
     if (!in_array('notes', $attendeeColumns, true)) {
         $database->exec("ALTER TABLE attendees ADD COLUMN notes TEXT NOT NULL DEFAULT ''");
+    }
+    if (!in_array('phone_number', $attendeeColumns, true)) {
+        $database->exec("ALTER TABLE attendees ADD COLUMN phone_number TEXT NOT NULL DEFAULT ''");
+    }
+    if (!in_array('email', $attendeeColumns, true)) {
+        $database->exec("ALTER TABLE attendees ADD COLUMN email TEXT NOT NULL DEFAULT ''");
     }
     @chmod($config['database_path'], 0600);
 } catch (Throwable $error) {
