@@ -203,6 +203,10 @@ unset($_SESSION['confirmed']);
                             <span aria-hidden="true">|</span>
                             <b lang="ar" dir="rtl" data-submit-label-ar>تأكيد الحضور</b>
                         </button>
+                        <a class="poster-download" href="/assets/invitation.jpeg" download="WHS-Egypt-2026-VIP-Invitation.jpeg">
+                            <span>DOWNLOAD INVITATION</span>
+                            <span lang="ar" dir="rtl">تحميل الدعوة</span>
+                        </a>
                         <span class="visually-hidden" data-submit-status aria-live="polite"></span>
                     </form>
                 <?php endif; ?>

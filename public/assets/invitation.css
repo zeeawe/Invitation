@@ -140,6 +140,33 @@ h1, h2, p { margin-block-start: 0; }
     text-align: center;
 }
 
+.poster-download {
+    display: flex;
+    width: fit-content;
+    min-height: 36px;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    margin: 12px auto 0;
+    padding: 6px 12px;
+    border: 1px solid var(--burgundy);
+    background: var(--burgundy);
+    color: #fffaf5;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.poster-download:hover {
+    transform: translateY(-1px);
+    border-color: var(--deep-plum);
+    background: var(--deep-plum);
+}
+
+.poster-download span[lang='ar'] { font-family: var(--arabic); font-size: 12px; font-weight: 500; }
+
 .details-panel { min-width: 0; animation: arrive .7s .1s both; }
 
 .eyebrow {
