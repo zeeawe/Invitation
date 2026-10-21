@@ -83,13 +83,21 @@ function renderInvitation() {
     status.textContent = 'Your invitation is ready to download.';
 }
 
-if (source?.complete && source.naturalWidth > 0) {
-    renderInvitation();
-} else {
-    source?.addEventListener('load', renderInvitation, { once: true });
-    source?.addEventListener('error', () => {
-        if (status) status.textContent = 'The personalized invitation could not be loaded. Please refresh and try again.';
-    }, { once: true });
+function showSourceError() {
+    if (status) status.textContent = 'The personalized invitation could not be loaded. Please refresh and try again.';
+}
+
+if (source) {
+    source.addEventListener('load', renderInvitation, { once: true });
+    source.addEventListener('error', showSourceError, { once: true });
+
+    if (source.complete) {
+        if (source.naturalWidth > 0) {
+            renderInvitation();
+        } else {
+            showSourceError();
+        }
+    }
 }
 
 downloadButton?.addEventListener('click', () => {
