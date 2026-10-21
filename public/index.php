@@ -208,13 +208,6 @@ unset($_SESSION['confirmed']);
                         <span class="visually-hidden" data-submit-status aria-live="polite"></span>
                     </form>
                 <?php endif; ?>
-                <div class="poster-download-section">
-                    <a class="poster-download" href="/invitation-image.php?download=1">
-                        <span>DOWNLOAD INVITATION</span>
-                        <span lang="ar" dir="rtl">تحميل الدعوة</span>
-                    </a>
-                </div>
-
             </div>
         </section>
 
