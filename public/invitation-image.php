@@ -7,7 +7,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'HEAD
     exit;
 }
 
-$imagePath = __DIR__ . '/assets/invitation.jpeg';
+$download = ($_GET['download'] ?? '') === '1';
+$imagePath = $download
+    ? __DIR__ . '/assets/invitation.jpeg'
+    : dirname(__DIR__) . '/hero/WHS-Egypt-2026-VIP-Invitation.jpeg';
 if (!is_file($imagePath) || !is_readable($imagePath)) {
     error_log('WHS invitation image is missing or unreadable: ' . $imagePath);
     http_response_code(404);
@@ -29,7 +32,6 @@ if ($imageSize === false) {
     exit('Invitation image is temporarily unavailable.');
 }
 
-$download = ($_GET['download'] ?? '') === '1';
 header('Content-Type: image/jpeg');
 header('Content-Length: ' . $imageSize);
 header('X-Content-Type-Options: nosniff');
