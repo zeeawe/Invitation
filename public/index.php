@@ -184,6 +184,50 @@ unset($_SESSION['confirmed']);
             </figure>
         </section>
 
+        <section class="contact-section" aria-labelledby="contact-title">
+            <div class="contact-heading">
+                <p class="arabic-kicker" lang="ar" dir="rtl">تواصل معنا</p>
+                <h2 id="contact-title">WHS Egypt 2026</h2>
+                <p lang="ar" dir="rtl">للاستفسارات والتواصل، اختاروا الطريقة المناسبة لكم</p>
+            </div>
+            <div class="contact-grid">
+                <a class="contact-card" href="https://whs-egy.com/" target="_blank" rel="noopener noreferrer">
+                    <span class="contact-card-label">WEBSITE</span>
+                    <span class="contact-card-value">whs-egy.com</span>
+                    <span class="contact-card-hint" lang="ar" dir="rtl">زيارة الموقع</span>
+                </a>
+                <a class="contact-card" href="mailto:contact@whs-egy.com">
+                    <span class="contact-card-label">EMAIL</span>
+                    <span class="contact-card-value">contact@whs-egy.com</span>
+                    <span class="contact-card-hint" lang="ar" dir="rtl">إرسال بريد إلكتروني</span>
+                </a>
+                <div class="contact-card">
+                    <span class="contact-card-label">CALL US</span>
+                    <span class="contact-phone-links">
+                        <a class="contact-phone-link" href="tel:01020180180" dir="ltr">01020180180</a>
+                        <a class="contact-phone-link" href="tel:01095828282" dir="ltr">01095828282</a>
+                    </span>
+                    <span class="contact-card-hint" lang="ar" dir="rtl">اتصل بنا</span>
+                </div>
+                <a class="contact-card" href="https://wa.me/201095828282" target="_blank" rel="noopener noreferrer">
+                    <span class="contact-card-label">WHATSAPP</span>
+                    <span class="contact-card-value" dir="ltr">+20 10 9582 8282</span>
+                    <span class="contact-card-hint" lang="ar" dir="rtl">راسلنا على واتساب</span>
+                </a>
+                <a class="contact-card" href="https://www.instagram.com/whs.egypt" target="_blank" rel="noopener noreferrer">
+                    <span class="contact-card-label">INSTAGRAM</span>
+                    <span class="contact-card-value">@whs.egypt</span>
+                    <span class="contact-card-hint" lang="ar" dir="rtl">تابعونا على إنستغرام</span>
+                </a>
+                <a class="contact-card" href="https://www.facebook.com/share/1BGPdkgBTt/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">
+                    <span class="contact-card-label">FACEBOOK</span>
+                    <span class="contact-card-value">WHS Egypt</span>
+                    <span class="contact-card-hint" lang="ar" dir="rtl">تابعونا على فيسبوك</span>
+                </a>
+            </div>
+            <p class="contact-organizer" lang="ar" dir="rtl">تنظيم <strong dir="ltr">Science Event Management</strong></p>
+        </section>
+
         <footer class="page-footer">
             <span>WOMEN'S HEALTH SUMMIT 2026</span>
             <span>CAIRO · 5—6 DECEMBER</span>
