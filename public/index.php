@@ -118,7 +118,7 @@ unset($_SESSION['confirmed']);
 
         <section class="invitation-layout" aria-labelledby="event-title">
             <figure class="poster-wrap">
-                <img class="poster" src="/assets/invitation.jpeg" alt="VIP invitation to the Women's Health Summit, 5–6 December 2026, at Cairo Marriott Hotel in Zamalek" width="904" height="1280">
+                <img class="poster" src="/invitation-image.php" alt="VIP invitation to the Women's Health Summit, 5–6 December 2026, at Cairo Marriott Hotel in Zamalek" width="904" height="1280">
             </figure>
 
             <div class="details-panel">
@@ -207,7 +207,7 @@ unset($_SESSION['confirmed']);
                     </form>
                 <?php endif; ?>
                 <div class="poster-download-section">
-                    <a class="poster-download" href="/assets/invitation.jpeg" download="WHS-Egypt-2026-VIP-Invitation.jpeg">
+                    <a class="poster-download" href="/invitation-image.php?download=1">
                         <span>DOWNLOAD INVITATION</span>
                         <span lang="ar" dir="rtl">تحميل الدعوة</span>
                     </a>
