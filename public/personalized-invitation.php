@@ -66,7 +66,7 @@ $professionalTitle = $attendee['professional_title'];
                     role="img"
                     aria-label="<?= escape('Personalized invitation for ' . $fullName) ?>"
                 ></canvas>
-                <img id="invitation-source" src="/invitation-image.php?personalized=1" alt="" hidden>
+                <img id="invitation-source" src="/assets/personalized-invitation.jpeg" alt="" hidden>
                 <span id="attendee-title" class="visually-hidden"><?= escape($professionalTitle) ?></span>
                 <span id="attendee-name" class="visually-hidden"><?= escape($fullName) ?></span>
             </figure>
