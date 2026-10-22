@@ -5,7 +5,7 @@ Standalone invitation and attendance confirmation site. It does not integrate wi
 ## Hosting Requirements
 
 - PHP 8.1 or later with `PDO_SQLite` and `mbstring` enabled.
-- An HTTPS-enabled subdomain whose document root can be set to this project's `public/` directory. Preserve `hero/WHS-Egypt-2026-VIP-Invitation.jpeg` beside `public/` for the hero image, `public/assets/invitation.jpeg` for downloads, and `porf/WHS-Egypt-2026-VIP-Invitation.jpeg` for personalized invitations. If the sibling `hero/` folder is not deployed, the hero automatically falls back to the public invitation image.
+- An HTTPS-enabled subdomain whose document root can be set to this project's `public/` directory. Preserve `hero/WHS-Egypt-2026-VIP-Invitation.jpeg` beside `public/` for the hero image; it uses the artwork from `porf/WHS-Egypt-2026-VIP-Invitation.jpeg`. The personalized invitation and its download use `public/assets/invitation.jpeg`. If the sibling `hero/` folder is not deployed, the hero automatically falls back to the public invitation image.
 - PHP write permission for this project's `var/` directory (the app creates it with private permissions if it does not exist).
 - Personalized invitation rendering uses browser Canvas and does not require PHP GD or Imagick.
 - A configured outbound PHP mail transport and an authorized sender address for RSVP notifications to `contact@whs-egy.com`.
