@@ -55,16 +55,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $notificationEmail = $config['notification_email'] ?? 'contact@whs-egy.com';
                 $mailFrom = $config['mail_from'] ?? 'noreply@whs-egy.com';
                 $mailSubject = 'New WHS Egypt 2026 VIP attendance confirmation';
-                $mailBody = "A new VIP attendance confirmation was saved.\n\n"
+                $textBody = "A new VIP attendance confirmation was saved.\n\n"
                     . "Full Name: {$fullName}\n"
                     . "Professional Title / Position: {$professionalTitle}\n"
                     . "Phone Number: {$phoneNumber}\n"
                     . "Email Address: {$email}\n"
                     . ($notes !== '' ? "Additional Notes: {$notes}\n" : '');
+                $mailRows = [
+                    'Full Name' => $fullName,
+                    'Professional Title / Position' => $professionalTitle,
+                    'Phone Number' => $phoneNumber,
+                    'Email Address' => $email,
+                ];
+                if ($notes !== '') {
+                    $mailRows['Additional Notes'] = $notes;
+                }
+
+                $htmlRows = '';
+                foreach ($mailRows as $label => $value) {
+                    $htmlRows .= '<tr>'
+                        . '<th align="left" style="padding:12px 16px;border-bottom:1px solid #eadfce;color:#64121f;'
+                        . 'font-size:14px;text-align:left;vertical-align:top">'
+                        . escape($label)
+                        . '</th>'
+                        . '<td style="padding:12px 16px;border-bottom:1px solid #eadfce;color:#332b2a;'
+                        . 'font-size:14px;overflow-wrap:anywhere">'
+                        . escape($value)
+                        . '</td>'
+                        . '</tr>';
+                }
+
+                $htmlBody = '<!doctype html><html><head><meta charset="UTF-8"></head>'
+                    . '<body style="margin:0;padding:24px;background:#f7f1e8;font-family:Arial,sans-serif">'
+                    . '<table role="presentation" width="100%" cellspacing="0" cellpadding="0"'
+                    . ' style="max-width:680px;margin:0 auto;background:#fffdf9;border:1px solid #eadfce">'
+                    . '<tr><td style="padding:24px 24px 12px">'
+                    . '<h1 style="margin:0;color:#64121f;font-size:22px;line-height:1.4">'
+                    . 'New WHS Egypt 2026 VIP Attendance Confirmation'
+                    . '</h1><p style="margin:8px 0 0;color:#665b55;font-size:14px">'
+                    . 'A new attendance confirmation has been saved.'
+                    . '</p></td></tr><tr><td style="padding:12px 24px 24px">'
+                    . '<table width="100%" cellspacing="0" cellpadding="0"'
+                    . ' style="border-collapse:collapse;border:1px solid #eadfce">'
+                    . $htmlRows
+                    . '</table></td></tr></table></body></html>';
+
+                $mailBoundary = '=_WHS_' . bin2hex(hash('sha256', $attendeeId . microtime(true), true));
+                $mailBody = '--' . $mailBoundary . "\r\n"
+                    . "Content-Type: text/plain; charset=UTF-8\r\n"
+                    . "Content-Transfer-Encoding: 8bit\r\n\r\n"
+                    . str_replace(["\r\n", "\r", "\n"], "\r\n", $textBody) . "\r\n"
+                    . '--' . $mailBoundary . "\r\n"
+                    . "Content-Type: text/html; charset=UTF-8\r\n"
+                    . "Content-Transfer-Encoding: 8bit\r\n\r\n"
+                    . $htmlBody . "\r\n"
+                    . '--' . $mailBoundary . "--\r\n";
                 $mailHeaders = [
                     'From: WHS Invitation <' . $mailFrom . '>',
                     'MIME-Version: 1.0',
-                    'Content-Type: text/plain; charset=UTF-8',
+                    'Content-Type: multipart/alternative; boundary="' . $mailBoundary . '"',
                 ];
 
                 if (filter_var($notificationEmail, FILTER_VALIDATE_EMAIL) === false
