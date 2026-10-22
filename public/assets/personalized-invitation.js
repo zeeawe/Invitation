@@ -49,9 +49,19 @@ function renderInvitation() {
         return;
     }
 
+    if (source.naturalWidth === 0 || source.naturalHeight === 0) {
+        showSourceError();
+        return;
+    }
+
     canvas.width = source.naturalWidth;
     canvas.height = source.naturalHeight;
-    context.drawImage(source, 0, 0);
+    try {
+        context.drawImage(source, 0, 0);
+    } catch {
+        showSourceError();
+        return;
+    }
 
     const scale = canvas.width / 908;
     const nameX = 75 * scale;
@@ -79,6 +89,7 @@ function renderInvitation() {
         context.fillText(line, nameX, nameY + index * lineHeight, maxWidth);
     });
 
+    canvas.hidden = false;
     downloadButton.disabled = false;
     status.textContent = 'Your invitation is ready to download.';
 }

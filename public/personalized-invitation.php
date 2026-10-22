@@ -23,31 +23,6 @@ if (!is_array($attendee) || !is_string($attendee['full_name'] ?? null)) {
 }
 
 $fullName = $attendee['full_name'];
-if (($_GET['source'] ?? '') === '1') {
-    $imagePath = dirname(__DIR__) . '/porf/WHS-Egypt-2026-VIP-Invitation.jpeg';
-    if (!is_file($imagePath) || !is_readable($imagePath)) {
-        error_log('WHS personalized invitation source image is missing or unreadable: ' . $imagePath);
-        http_response_code(404);
-        exit('Invitation image not found.');
-    }
-
-    $imageSize = filesize($imagePath);
-    $image = fopen($imagePath, 'rb');
-    if ($imageSize === false || $image === false) {
-        http_response_code(503);
-        exit('Invitation image is temporarily unavailable.');
-    }
-
-    header('Content-Type: image/jpeg');
-    header('Content-Length: ' . $imageSize);
-    header('Cache-Control: private, no-store');
-    header('X-Content-Type-Options: nosniff');
-    if (fpassthru($image) === false) {
-        error_log('WHS personalized invitation source image could not be streamed.');
-    }
-    fclose($image);
-    exit;
-}
 ?>
 <!doctype html>
 <html lang="en">
@@ -82,10 +57,11 @@ if (($_GET['source'] ?? '') === '1') {
                     id="personalized-poster"
                     width="908"
                     height="1280"
+                    hidden
                     role="img"
                     aria-label="<?= escape('Personalized invitation for ' . $fullName) ?>"
                 ></canvas>
-                <img id="invitation-source" src="/personalized-invitation.php?source=1" alt="" hidden>
+                <img id="invitation-source" src="/assets/invitation.jpeg" alt="" hidden>
                 <span id="attendee-name" class="visually-hidden"><?= escape($fullName) ?></span>
             </figure>
             <button class="poster-download personalized-download" id="download-invitation" type="button" disabled>

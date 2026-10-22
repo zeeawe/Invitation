@@ -482,6 +482,10 @@ h1, h2, p { margin-block-start: 0; }
     background: var(--paper);
 }
 
+.personalized-poster[hidden] {
+    display: none;
+}
+
 .personalized-download {
     min-width: 210px;
     min-height: 48px;
