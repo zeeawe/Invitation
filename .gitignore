@@ -1,3 +1,4 @@
 /config.php
 /var/*.sqlite
 /var/*.sqlite-*
+/public/assets/*.bak
