@@ -1,5 +1,6 @@
 const canvas = document.querySelector('#personalized-poster');
 const source = document.querySelector('#invitation-source');
+const attendeeTitle = document.querySelector('#attendee-title')?.textContent ?? '';
 const attendeeName = document.querySelector('#attendee-name')?.textContent ?? '';
 const downloadButton = document.querySelector('#download-invitation');
 const status = document.querySelector('#personalized-status');
@@ -44,7 +45,7 @@ function wrapName(text, maxWidth) {
 }
 
 function renderInvitation() {
-    if (!canvas || !source || !context || !downloadButton || !status || !attendeeName) {
+    if (!canvas || !source || !context || !downloadButton || !status || !attendeeTitle || !attendeeName) {
         if (status) status.textContent = 'The personalized invitation could not be prepared.';
         return;
     }
@@ -68,9 +69,10 @@ function renderInvitation() {
     const nameY = 565 * scale;
     const maxWidth = 258 * scale;
     const maxHeight = 150 * scale;
-    const direction = /[\u0590-\u08ff]/u.test(attendeeName) ? 'rtl' : 'ltr';
+    const direction = /[\u0590-\u08ff]/u.test(`${attendeeTitle} ${attendeeName}`) ? 'rtl' : 'ltr';
     let fontSize = 34 * scale;
-    let lines;
+    let titleLines;
+    let nameLines;
 
     context.fillStyle = '#64121f';
     context.textAlign = 'left';
@@ -79,13 +81,14 @@ function renderInvitation() {
 
     do {
         context.font = `600 ${fontSize}px Arial, sans-serif`;
-        lines = wrapName(attendeeName, maxWidth);
-        if (lines.length * fontSize * 1.16 <= maxHeight || fontSize <= 12 * scale) break;
+        titleLines = wrapName(attendeeTitle, maxWidth);
+        nameLines = wrapName(attendeeName, maxWidth);
+        if ((titleLines.length + nameLines.length) * fontSize * 1.16 <= maxHeight || fontSize <= 12 * scale) break;
         fontSize -= scale;
     } while (fontSize > 0);
 
     const lineHeight = fontSize * 1.16;
-    lines.forEach((line, index) => {
+    [...titleLines, ...nameLines].forEach((line, index) => {
         context.fillText(line, nameX, nameY + index * lineHeight, maxWidth);
     });
 

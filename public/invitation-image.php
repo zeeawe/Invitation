@@ -8,11 +8,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'HEAD
 }
 
 $download = ($_GET['download'] ?? '') === '1';
+$personalized = ($_GET['personalized'] ?? '') === '1';
 $downloadImagePath = __DIR__ . '/assets/invitation.jpeg';
 $heroImagePath = dirname(__DIR__) . '/hero/WHS-Egypt-2026-VIP-Invitation.jpeg';
-$imagePath = $download ? $downloadImagePath : $heroImagePath;
+$personalizedImagePath = dirname(__DIR__) . '/finel/WhatsApp Image 2026-10-20 at 8.14.29 PM.jpeg';
+$imagePath = $personalized
+    ? $personalizedImagePath
+    : ($download ? $downloadImagePath : $heroImagePath);
 
-if (!$download && (!is_file($imagePath) || !is_readable($imagePath))) {
+if (!$download && !$personalized && (!is_file($imagePath) || !is_readable($imagePath))) {
     error_log('WHS hero image is missing or unreadable; using the public invitation image instead.');
     $imagePath = $downloadImagePath;
 }

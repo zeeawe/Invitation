@@ -14,15 +14,20 @@ if (!is_int($attendeeId) || $attendeeId < 1) {
     redirect('/');
 }
 
-$statement = $database->prepare('SELECT full_name FROM attendees WHERE id = :id');
+$statement = $database->prepare('SELECT full_name, professional_title FROM attendees WHERE id = :id');
 $statement->execute([':id' => $attendeeId]);
 $attendee = $statement->fetch();
-if (!is_array($attendee) || !is_string($attendee['full_name'] ?? null)) {
+if (
+    !is_array($attendee)
+    || !is_string($attendee['full_name'] ?? null)
+    || !is_string($attendee['professional_title'] ?? null)
+) {
     unset($_SESSION['confirmed_attendee_id']);
     redirect('/');
 }
 
 $fullName = $attendee['full_name'];
+$professionalTitle = $attendee['professional_title'];
 ?>
 <!doctype html>
 <html lang="en">
@@ -61,7 +66,8 @@ $fullName = $attendee['full_name'];
                     role="img"
                     aria-label="<?= escape('Personalized invitation for ' . $fullName) ?>"
                 ></canvas>
-                <img id="invitation-source" src="/assets/invitation.jpeg" alt="" hidden>
+                <img id="invitation-source" src="/invitation-image.php?personalized=1" alt="" hidden>
+                <span id="attendee-title" class="visually-hidden"><?= escape($professionalTitle) ?></span>
                 <span id="attendee-name" class="visually-hidden"><?= escape($fullName) ?></span>
             </figure>
             <button class="poster-download personalized-download" id="download-invitation" type="button" disabled>
