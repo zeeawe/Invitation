@@ -24,7 +24,7 @@ if (!is_array($attendee) || !is_string($attendee['full_name'] ?? null)) {
 
 $fullName = $attendee['full_name'];
 if (($_GET['source'] ?? '') === '1') {
-    $imagePath = dirname(__DIR__) . '/porf/WhatsApp Image 2026-10-21 at 10.29.31 PM (1).jpeg';
+    $imagePath = dirname(__DIR__) . '/porf/WHS-Egypt-2026-VIP-Invitation.jpeg';
     if (!is_file($imagePath) || !is_readable($imagePath)) {
         error_log('WHS personalized invitation source image is missing or unreadable: ' . $imagePath);
         http_response_code(404);
