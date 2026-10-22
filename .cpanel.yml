@@ -1,0 +1,9 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/vr1cq4drkh3o/public_html/vip.invitation/Invitation-main/public
+    - /bin/mkdir -p $DEPLOYPATH/assets
+    - /bin/cp -f public/index.php $DEPLOYPATH/index.php
+    - /bin/cp -f public/admin.php $DEPLOYPATH/admin.php
+    - /bin/cp -f public/invitation-image.php $DEPLOYPATH/invitation-image.php
+    - /bin/cp -f public/personalized-invitation.php $DEPLOYPATH/personalized-invitation.php
+    - /bin/cp -a public/assets/. $DEPLOYPATH/assets/
